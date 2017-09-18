@@ -41,17 +41,17 @@ def get_title(url):
 
 # f :: [URL] -> (Discourse Side Effect) :D
 def post_urls_on_discourse(urls):
-    title = get_title(urls[0])
+    title = get_title(urls[0]).replace('–','-') # Prevent some utf8 errors/warnings
     raw = "\n".join(urls)
     category = '4' # Staff by default
     url = "http://discourse.acmupm.es/posts"
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"api_key\"\r\n\r\n " + config['token'] + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"api_username\"\r\n\r\n" + config['user']     + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"title\"\r\n\r\n" + title    + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"raw\"\r\n\r\n" + raw      + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"category\"\r\n\r\n" + category + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"api_key\"\r\n\r\n{}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"api_username\"\r\n\r\n{}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"title\"\r\n\r\n{}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"raw\"\r\n\r\n{}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"category\"\r\n\r\n{}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--".format(config['token'], config['user'], title, raw, category)
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
-        'cache-control': "no-cache",
+        'cache-control': "no-cache"
     }
     response = requests.request("POST", url, data=payload, headers=headers)
-    print(title, str(response.status))
+    print(title, str(response.text))
 
 def process_msg(msg):
     urls = match_URL(msg)
